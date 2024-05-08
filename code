@@ -1,0 +1,30 @@
+import pyshark
+import csv
+
+# Open the .pcap file
+cap = pyshark.FileCapture('yourfile.pcap')
+
+# Open a .csv file in write mode
+with open('output.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+
+    # Write header row
+    writer.writerow(['No.', 'Time', 'Source', 'Destination', 'Protocol', 'Length'])
+
+    # Iterate over each packet
+    for packet in cap:
+        try:
+            # Extract relevant information from each packet
+            no = packet.number
+            time = packet.sniff_timestamp
+            source = packet.ip.src
+            destination = packet.ip.dst
+            protocol = packet.transport_layer
+            length = packet.length
+
+            # Write the information to the .csv file
+            writer.writerow([no, time, source, destination, protocol, length])
+
+        except AttributeError:
+            # Ignore packets that don't have required attributes (e.g., non-IP packets)
+            pass
